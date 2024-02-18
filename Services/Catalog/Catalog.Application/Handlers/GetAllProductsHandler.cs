@@ -18,7 +18,7 @@ namespace Catalog.Application.Handlers
         }
         public async Task<Pagination<ProductResponse>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
-            var productList = await _productRepository.GetProducts(request.CatalogSpecParams);
+            var productList = await _productRepository.GetAsync(request.CatalogSpecParams);
             var productListResponse =
                 ProductMapper.Mapper.Map<Pagination<ProductResponse>>(productList);
             return productListResponse;

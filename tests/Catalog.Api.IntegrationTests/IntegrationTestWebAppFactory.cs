@@ -3,6 +3,7 @@ using Catalog.Infrastructure.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
 namespace Catalog.Api.IntegrationTests
@@ -18,7 +19,7 @@ namespace Catalog.Api.IntegrationTests
             builder.ConfigureTestServices(services =>
             {
                 var descriptor = services
-                    .SingleOrDefault(s => s.ServiceType == typeof(ICatalogContext));
+                    .SingleOrDefault(s => s.ServiceType == typeof(CatalogContext));
 
                 if (descriptor is not null)
                 {

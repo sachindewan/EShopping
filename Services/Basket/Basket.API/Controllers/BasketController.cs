@@ -1,16 +1,23 @@
 ﻿using Basket.Application.Commands;
 using Basket.Application.Queries;
 using Basket.Application.Responses;
+using Basket.Application.Services;
+using Discount.Grpc.Protos;
+using Google.Protobuf;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net;
+using System.Text;
 
 namespace Basket.API.Controllers
 {
     public class BasketController : ApiController
     {
-        public BasketController()
+        private readonly DiscountGrpcService discountGrpcService;
+
+        public BasketController(DiscountGrpcService discountGrpcService)
         {
-            
+            this.discountGrpcService = discountGrpcService;
         }
 
         [HttpGet]
@@ -28,6 +35,11 @@ namespace Basket.API.Controllers
         public async Task<ActionResult<ShoppingCartResponse>> UpdateBasket([FromBody] CreateShoppingCartCommand createShoppingCartCommand)
         {
 
+            foreach (var item in createShoppingCartCommand.Items)
+            {
+                var coupon = await discountGrpcService.GetDiscountAsync(item.ProductName);
+                item.Price -= coupon.Amount;
+            }
             var basket = await Mediator.Send(createShoppingCartCommand);
             return Ok(basket);
         }

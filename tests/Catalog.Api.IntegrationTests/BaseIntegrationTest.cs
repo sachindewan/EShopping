@@ -16,13 +16,13 @@ namespace Catalog.Api.IntegrationTests
         private readonly IServiceScope _scope;
         protected readonly ISender Sender;
 
-        protected readonly ICatalogContext CatalogContext;
+        protected readonly CatalogContext CatalogContext;
         protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
         {
             _scope = factory.Services.CreateScope();
 
             Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
-            CatalogContext = _scope.ServiceProvider.GetRequiredService<ICatalogContext>();
+            CatalogContext = _scope.ServiceProvider.GetRequiredService<CatalogContext>();
         }
         public void Dispose()
         {

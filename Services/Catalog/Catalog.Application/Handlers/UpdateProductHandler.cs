@@ -19,7 +19,7 @@ namespace Catalog.Application.Handlers
             {
                 Id = request.Id,
                 Description = request.Description,
-                ImageFile = request.ImageFile,
+                ImageUrl = request.ImageFile,
                 Name = request.Name,
                 Price = request.Price,
                 Summary = request.Summary,

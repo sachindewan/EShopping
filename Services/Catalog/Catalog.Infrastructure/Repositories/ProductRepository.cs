@@ -2,119 +2,106 @@
 using Catalog.Core.Repositories;
 using Catalog.Core.Specs;
 using Catalog.Infrastructure.Data;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using Dapper;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using System.Data.Common;
+using System.Linq.Expressions;
+using static Dapper.SqlMapper;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Catalog.Infrastructure.Repositories
 {
     public class ProductRepository : IProductRepository, IBrandRepository, ITypesRepository
     {
-        private readonly ICatalogContext _context;
+        private readonly CatalogContext _context;
+        private readonly NpgsqlDataSource npgsqlDataSource;
 
-        public ProductRepository(ICatalogContext context)
+        public ProductRepository(CatalogContext context,NpgsqlDataSource npgsqlDataSource)
         {
             _context = context;
+            this.npgsqlDataSource = npgsqlDataSource;
         }
-        public async Task<Pagination<Product>> GetProducts(CatalogSpecParams catalogSpecParams)
+
+        public async Task<Pagination<Product>> GetAsync(CatalogSpecParams catalogSpecParams, Expression<Func<Product, bool>> filter = null, Func<IQueryable<Product>, IOrderedQueryable<Product>> orderBy = null, string includeProperties = "")
         {
-            var builder = Builders<Product>.Filter;
-            var filter = builder.Empty;
-            if (!string.IsNullOrEmpty(catalogSpecParams.Search))
+            IQueryable<Product> query = _context.Products;
+
+            if (filter == null)
             {
-                var searchFilter = builder.Regex(x => x.Name, new BsonRegularExpression(catalogSpecParams.Search));
-                filter &= searchFilter;
-            }
-            if (!string.IsNullOrEmpty(catalogSpecParams.BrandId))
-            {
-                var brandFilter = builder.Eq(x => x.Brands.Id, catalogSpecParams.BrandId);
-                filter &= brandFilter;
-            }
-            if (!string.IsNullOrEmpty(catalogSpecParams.TypeId))
-            {
-                var typeFilter = builder.Eq(x => x.Types.Id, catalogSpecParams.TypeId);
-                filter &= typeFilter;
-            }
-            if (!string.IsNullOrEmpty(catalogSpecParams.Sort))
-            {
-                return new Pagination<Product>
+                if(catalogSpecParams.TypeId != null)
                 {
-                    PageSize = catalogSpecParams.PageSize,
-                    PageIndex = catalogSpecParams.PageIndex,
-                    Data = await DataFilter(catalogSpecParams, filter),
-                    Count = await _context.Products.CountDocumentsAsync(p =>
-                        true) //TODO: Need to check while applying with UI
-                };
+                    filter = filter=>filter.Types.Id.Equals(catalogSpecParams.TypeId);
+                }
+                includeProperties += nameof(Product.Types);
             }
+
             return new Pagination<Product>
             {
                 PageSize = catalogSpecParams.PageSize,
                 PageIndex = catalogSpecParams.PageIndex,
                 Data = await _context
-                    .Products
-                    .Find(filter)
-                    .Sort(Builders<Product>.Sort.Ascending("Name"))
-                    .Skip(catalogSpecParams.PageSize * (catalogSpecParams.PageIndex - 1))
-                    .Limit(catalogSpecParams.PageSize)
-                    .ToListAsync(),
-                Count = await _context.Products.CountDocumentsAsync(p => true)
+                   .Products
+                   .Where(filter)
+                   .Skip(catalogSpecParams.PageSize * (catalogSpecParams.PageIndex - 1))
+                   .Take(catalogSpecParams.PageSize).Include(includeProperties)
+                   .ToListAsync(),
+                Count = await _context.Products.CountAsync()
             };
-        }
-        private async Task<IReadOnlyList<Product>> DataFilter(CatalogSpecParams catalogSpecParams, FilterDefinition<Product> filter)
-        {
-            switch (catalogSpecParams.Sort)
-            {
-                case "priceAsc":
-                    return await _context
-                        .Products
-                        .Find(filter)
-                        .Sort(Builders<Product>.Sort.Ascending("Price"))
-                        .Skip(catalogSpecParams.PageSize * (catalogSpecParams.PageIndex - 1))
-                        .Limit(catalogSpecParams.PageSize)
-                        .ToListAsync();
-                case "priceDesc":
-                    return await _context
-                        .Products
-                        .Find(filter)
-                        .Sort(Builders<Product>.Sort.Descending("Price"))
-                        .Skip(catalogSpecParams.PageSize * (catalogSpecParams.PageIndex - 1))
-                        .Limit(catalogSpecParams.PageSize)
-                        .ToListAsync();
-                default:
-                    return await _context
-                        .Products
-                        .Find(filter)
-                        .Sort(Builders<Product>.Sort.Ascending("Name"))
-                        .Skip(catalogSpecParams.PageSize * (catalogSpecParams.PageIndex - 1))
-                        .Limit(catalogSpecParams.PageSize)
-                        .ToListAsync();
-            }
         }
         public async Task<Product> GetProduct(string id)
         {
-            return await _context.Products.Find(p => p.Id == id).FirstOrDefaultAsync();
+            string sql = "SELECT *\r\nFROM public.\"Products\" p\r\nINNER JOIN public.\"Brands\" b ON p.\"BrandsId\" = b.\"Id\"\r\nINNER JOIN public.\"Types\" t ON p.\"TypesId\" = t.\"Id\"\r\nWHERE p.\"Id\" = @id";
+            using var connection = npgsqlDataSource.CreateConnection();
+            await connection.OpenAsync();
+
+            //using var command = connection.CreateCommand();
+            //command.CommandText = sql;
+
+            //using var reader = await command.ExecuteReaderAsync();
+
+            //var examples = new List<Product>();
+            //while (await reader.ReadAsync())
+            //{
+            //    var example = new Product
+            //    {
+            //        Id = reader.GetString(0),
+            //        Name = reader.GetString(1),
+            //    };
+
+            //    examples.Add(example);
+            //}
+            var examples = await connection.QueryAsync<Product, ProductBrand,ProductType, Product>(sql, (product
+                , brand,type) =>
+            {
+                product.Brands = brand;
+                product.Types = type;
+                return product;
+            },new { id}, splitOn: "id");
+
+            return examples.FirstOrDefault();
+           // return await _context.Products.Where(x=>x.Id==id).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Product>> GetProductByName(string name)
         {
-            FilterDefinition<Product> filter = Builders<Product>.Filter.Eq(p => p.Name, name);
             return await _context
                 .Products
-                .Find(filter)
+                .Where(x=>x.Name==name)
                 .ToListAsync();
         }
 
         public async Task<IEnumerable<Product>> GetProductByBrand(string name)
         {
-            FilterDefinition<Product> filter = Builders<Product>.Filter.Eq(p => p.Brands.Name, name);
             return await _context
                 .Products
-                .Find(filter)
+                .Where(x=>x.Brands.Name == name)
                 .ToListAsync();
         }
 
         public async Task<Product> CreateProduct(Product product)
         {
-            await _context.Products.InsertOneAsync(product);
+            await _context.Products.AddAsync(product);
             return product;
         }
 
@@ -122,24 +109,30 @@ namespace Catalog.Infrastructure.Repositories
         {
             var updateResult = await _context
                 .Products
-                .ReplaceOneAsync(p => p.Id == product.Id, product);
-            return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+                  .Where(model => model.Id == product.Id)
+                .ExecuteUpdateAsync(setters => setters
+                  .SetProperty(m => m.Id, product.Id)
+                  .SetProperty(m => m.Name, product.Name)
+                  .SetProperty(m => m.Description, product.Description)
+                  .SetProperty(m => m.Price, product.Price)
+                  .SetProperty(m => m.ImageUrl, product.ImageUrl)
+                );
+            return updateResult > 0;
         }
 
         public async Task<bool> DeleteProduct(string id)
         {
-            FilterDefinition<Product> filter = Builders<Product>.Filter.Eq(p => p.Id, id);
-            DeleteResult deleteResult = await _context
-                .Products
-                .DeleteOneAsync(filter);
-            return deleteResult.IsAcknowledged && deleteResult.DeletedCount > 0;
+            var deleteResult = await _context
+                    .Products
+                    .Where(model => model.Id == id)
+                .ExecuteDeleteAsync();
+            return deleteResult > 0;
         }
 
         public async Task<IEnumerable<ProductBrand>> GetAllBrands()
         {
             return await _context
                 .Brands
-                .Find(b => true)
                 .ToListAsync();
         }
 
@@ -147,7 +140,6 @@ namespace Catalog.Infrastructure.Repositories
         {
             return await _context
                 .Types
-                .Find(t => true)
                 .ToListAsync();
         }
     }
