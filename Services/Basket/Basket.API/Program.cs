@@ -7,7 +7,9 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.AddServiceDefaults();
+
 builder.Services.AddDistributedMemoryCache();
 //builder.AddRedisDistributedCache("distributedCache", setting =>
 //{
@@ -31,10 +33,12 @@ builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(
 
 var app = builder.Build();
 
+app.MapDefaultEndpoints();
+
+
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Basket.API"));
 
-app.MapDefaultEndpoints();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

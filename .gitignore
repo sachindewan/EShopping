@@ -43,3 +43,9 @@
 /tests/Catalog.Api.IntegrationTests/bin/Debug
 /tests/Catalog.Api.IntegrationTests/obj
 /Services/Order/Order.Core/bin/Debug/net8.0
+/AppHost/bin/Debug/net8.0
+/AppHost/obj
+/ServiceDefaults/bin/Debug/net8.0
+/ServiceDefaults/obj
+/Espire.AppHost/bin/Debug/net8.0
+/Espire.AppHost/obj

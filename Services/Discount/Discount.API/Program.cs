@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+
+
 //3 using npg sql database component instead of entity framework core , using dapper here.
 builder.AddNpgsqlDataSource("discountdb");
 builder.Services.AddMediatR(typeof(CreateDiscountCommandHandler).GetTypeInfo().Assembly);
@@ -21,6 +23,8 @@ builder.Services.AddGrpc();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+
 
 
 app.UseRouting();

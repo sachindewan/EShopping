@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\EShopping.ServiceDefaults\EShopping.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\Eshopping.ServiceDefaults\Eshopping.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
     <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
   </ItemGroup>

@@ -14,18 +14,18 @@ var postgressDBConnectionString = configuration.GetConnectionString("postgressdb
 var discountDBConnectionString = configuration.GetConnectionString("discountdb");
 var orderDbConnectionString = configuration.GetConnectionString("orderdb");
 // Orchestration
-var postgressDB = builder.AddPostgresConnection("postgressdb", postgressDBConnectionString);
-var discountDB = builder.AddPostgresConnection("discountdb", discountDBConnectionString);
-var orderDb = builder.AddPostgresConnection("orderdb", orderDbConnectionString);
+//var postgressDB = builder.AddPostgres("postgressdb");
+//var discountDB = builder.AddPostgresConnection("discountdb", discountDBConnectionString);
+//var orderDb = builder.AddPostgresConnection("orderdb", orderDbConnectionString);
 // var distributedCaching = builder.AddRedis("distributedCache");
-var discountApi = builder.AddProject<Projects.Discount_API>("discountapi").WithReference(discountDB);
+var discountApi = builder.AddProject<Projects.Discount_API>("discountapi");
 
 builder.AddProject<Projects.Basket_API>("basket.api").WithReference(discountApi);//.WithReference(distributedCaching);
 
-builder.AddProject<Projects.Catalog_API>("catalog.api").WithReference(postgressDB);
+builder.AddProject<Projects.Catalog_API>("catalog.api");
 
 
-builder.AddProject<Projects.Order_Api>("order.api").WithReference(orderDb);
+builder.AddProject<Projects.Order_Api>("order.api");
 
 
 builder.Build().Run();
