@@ -39,8 +39,30 @@ public class OrderContextSeed
                 Cvv = "123",
                 PaymentMethod = 1,
                 LastModifiedBy = "Rahul",
-                LastModifiedDate = new DateTime(),
+                CreatedDate = DateTime.Now.ToString(),
+                LastModifiedDate = DateTime.Now.ToString(),
             }
         };
+    }
+
+
+}
+public static class DateTimeExtensions
+{
+    public static DateTime? SetKindUtc(this DateTime? dateTime)
+    {
+        if (dateTime.HasValue)
+        {
+            return dateTime.Value.SetKindUtc();
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public static DateTime SetKindUtc(this DateTime dateTime)
+    {
+        if (dateTime.Kind == DateTimeKind.Utc) { return dateTime; }
+        return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
     }
 }

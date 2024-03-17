@@ -14,8 +14,8 @@ namespace Order.Core.Common
         public int Id { get; protected set; }
         //Below Properties are Audit properties
         public string? CreatedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public string CreatedDate { get; set; }
         public string? LastModifiedBy { get; set; }
-        public DateTime? LastModifiedDate { get; set; }
+        public string LastModifiedDate { get; set; }
     }
 }

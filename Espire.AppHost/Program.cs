@@ -18,6 +18,12 @@ var orderDbConnectionString = configuration.GetConnectionString("orderdb");
 //var discountDB = builder.AddPostgresConnection("discountdb", discountDBConnectionString);
 //var orderDb = builder.AddPostgresConnection("orderdb", orderDbConnectionString);
 // var distributedCaching = builder.AddRedis("distributedCache");
+
+
+//messaging support
+
+//var rabbit = builder.AddRabbitMQContainer("messaging", password: "aspire");
+
 var discountApi = builder.AddProject<Projects.Discount_API>("discountapi");
 
 builder.AddProject<Projects.Basket_API>("basket.api").WithReference(discountApi);//.WithReference(distributedCaching);
@@ -26,6 +32,5 @@ builder.AddProject<Projects.Catalog_API>("catalog.api");
 
 
 builder.AddProject<Projects.Order_Api>("order.api");
-
-
+builder.AddProject<Projects.Aspire_RabbitMq_Consumer>("consumers");//.WithReference(rabbit);
 builder.Build().Run();

@@ -19,11 +19,11 @@ namespace Order.Infrastructure.Data
                 switch(entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.CreatedDate = DateTime.Now;
+                        entry.Entity.CreatedDate = DateTime.Now.ToString();
                         entry.Entity.CreatedBy = "sachin"; //TODO: This will be replaced Identity Server
                         break;
                     case EntityState.Modified:
-                        entry.Entity.LastModifiedDate = DateTime.Now;
+                        entry.Entity.LastModifiedDate = DateTime.Now.ToString();
                         entry.Entity.LastModifiedBy = "sachin"; //TODO: This will be replaced Identity Server
                         break;
                 }

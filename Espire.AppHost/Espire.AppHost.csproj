@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\InfraStructure\Aspire.RabbitMq.Consumer\Aspire.RabbitMq.Consumer.csproj" />
     <ProjectReference Include="..\Services\Basket\Basket.API\Basket.API.csproj" />
     <ProjectReference Include="..\Services\Catalog\Catalog.API\Catalog.API.csproj" />
     <ProjectReference Include="..\Services\Discount\Discount.API\Discount.API.csproj" />

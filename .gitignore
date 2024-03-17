@@ -49,3 +49,7 @@
 /ServiceDefaults/obj
 /Espire.AppHost/bin/Debug/net8.0
 /Espire.AppHost/obj
+/InfraStructure/Aspire.RabbitMq.Consumer/bin/Debug/net8.0
+/InfraStructure/EventBus.Messages.Common/bin/Debug/net8.0
+/InfraStructure/EventBus.Messages.Common/obj
+/InfraStructure/Aspire.RabbitMq.Consumer/obj

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.RabbitMQ.Client" Version="8.0.0-preview.3.24105.21" />
     <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="8.0.0-preview.2.23619.3" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
@@ -14,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Eshopping.ServiceDefaults\Eshopping.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\InfraStructure\EventBus.Messages.Common\EventBus.Messages.Common.csproj" />
     <ProjectReference Include="..\Basket.Application\Basket.Application.csproj" />
     <ProjectReference Include="..\Basket.Infrastructure\Basket.Infrastructure.csproj" />
   </ItemGroup>
