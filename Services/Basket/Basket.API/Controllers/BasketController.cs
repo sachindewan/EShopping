@@ -3,9 +3,12 @@ using Basket.Application.Queries;
 using Basket.Application.Responses;
 using Basket.Application.Services;
 using Discount.Grpc.Protos;
+using Espire.Common.Logging.Correlation;
 using Google.Protobuf;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Writers;
 using Newtonsoft.Json;
+using Polly;
 using System.Net;
 using System.Text;
 
@@ -14,10 +17,14 @@ namespace Basket.API.Controllers
     public class BasketController : ApiController
     {
         private readonly DiscountGrpcService discountGrpcService;
-
-        public BasketController(DiscountGrpcService discountGrpcService)
+        private readonly ICorrelationIdGenerator correlationIdGenerator;
+        private readonly ILogger<BasketController> logger;
+   
+        public BasketController(DiscountGrpcService discountGrpcService,ICorrelationIdGenerator correlationIdGenerator,ILogger<BasketController> logger)
         {
             this.discountGrpcService = discountGrpcService;
+            this.correlationIdGenerator = correlationIdGenerator;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -50,6 +57,7 @@ namespace Basket.API.Controllers
         public async Task<ActionResult<ShoppingCartResponse>> DeleteBasket(string userName)
         {
             var query = new DeleteBasketByUserNameQuery(userName);
+            logger.LogInformation("basket deleted successfully.");
             return Ok(await Mediator.Send(query));
         }
     }

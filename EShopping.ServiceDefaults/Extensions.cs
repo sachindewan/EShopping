@@ -1,14 +1,16 @@
+using Eshopping.ServiceDefaults;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.Enrichment;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
-using System;
 
 namespace Microsoft.Extensions.Hosting
 {
@@ -78,9 +80,12 @@ namespace Microsoft.Extensions.Hosting
             {
                 ConfigureService.Invoke(() => Convert.ToBoolean(builder.Configuration["ConfigureSerilog"]) == false, () =>
                 {
-                    builder.Services.Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter());
+                    builder.Services.Configure<OpenTelemetryLoggerOptions>(logging =>
+                    {
+                        logging.AddOtlpExporter();
+                    });
                 });
-          
+
                 ConfigureService.Invoke(() => Convert.ToBoolean(builder.Configuration["ConfigureSerilog"]) == true, () =>
                 {
                     SinkSeriLogToOpenTelemetry(builder, logBuilder);
@@ -95,7 +100,7 @@ namespace Microsoft.Extensions.Hosting
 
                 builder.Logging.AddSerilog();
             });
-           
+
             // Uncomment the following lines to enable the Prometheus exporter (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
             // builder.Services.AddOpenTelemetry()
             //    .WithMetrics(metrics => metrics.AddPrometheusExporter());

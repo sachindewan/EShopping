@@ -59,6 +59,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aspire.RabbitMq.Consumer", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus.Messages.Common", "InfraStructure\EventBus.Messages.Common\EventBus.Messages.Common.csproj", "{C9D00C9D-49DC-4726-9F39-9616A5D39913}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Espire.Common.Logging", "Espire.Common.Logging\Espire.Common.Logging.csproj", "{F23B54E2-3056-4369-AD01-B15BB894B2C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -149,6 +151,10 @@ Global
 		{C9D00C9D-49DC-4726-9F39-9616A5D39913}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9D00C9D-49DC-4726-9F39-9616A5D39913}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9D00C9D-49DC-4726-9F39-9616A5D39913}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F23B54E2-3056-4369-AD01-B15BB894B2C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F23B54E2-3056-4369-AD01-B15BB894B2C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F23B54E2-3056-4369-AD01-B15BB894B2C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F23B54E2-3056-4369-AD01-B15BB894B2C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -177,6 +183,7 @@ Global
 		{AE3C70DF-845F-4817-8504-63461A430F04} = {5CC0890C-8728-49B6-9389-E7EFD3D06F6B}
 		{523E4CF6-D607-4A9A-9BA8-975A5C1E510B} = {69EF4329-0320-44FC-94E0-0A8A2450CDBB}
 		{C9D00C9D-49DC-4726-9F39-9616A5D39913} = {69EF4329-0320-44FC-94E0-0A8A2450CDBB}
+		{F23B54E2-3056-4369-AD01-B15BB894B2C2} = {69EF4329-0320-44FC-94E0-0A8A2450CDBB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BC3AFC96-8114-4A6C-BBF2-E4D22657257F}
