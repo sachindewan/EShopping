@@ -9,6 +9,15 @@ var configuration = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
+var grafana = builder.AddContainer("grafana", "grafana/grafana")
+    .WithVolumeMount("../grafana/config", "/etc/grafana")
+    .WithVolumeMount("../grafana/dashboards", "/var/lib/grafana/dashboards")
+    .WithEndpoint(containerPort: 3000, hostPort: 3000, name: "grafana-http", scheme: "http");
+
+builder.AddContainer("prometheus", "prom/prometheus")
+    .WithVolumeMount("../prometheus", "/etc/prometheus")
+    .WithEndpoint(9090, hostPort: 9090);
+
 // Get connection strings from configuration
 var postgressDBConnectionString = configuration.GetConnectionString("postgressdb");
 var discountDBConnectionString = configuration.GetConnectionString("discountdb");
@@ -26,11 +35,12 @@ var orderDbConnectionString = configuration.GetConnectionString("orderdb");
 
 var discountApi = builder.AddProject<Projects.Discount_API>("discountapi");
 
-builder.AddProject<Projects.Basket_API>("basket.api").WithReference(discountApi);//.WithReference(distributedCaching);
+builder.AddProject<Projects.Basket_API>("basket.api").WithReference(discountApi)
+.WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));//.WithReference(distributedCaching);
 
-builder.AddProject<Projects.Catalog_API>("catalog.api");
+builder.AddProject<Projects.Catalog_API>("catalog.api").WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));
 
 
-builder.AddProject<Projects.Order_Api>("order.api");
-builder.AddProject<Projects.Aspire_RabbitMq_Consumer>("consumers");//.WithReference(rabbit);
+builder.AddProject<Projects.Order_Api>("order.api").WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));
+builder.AddProject<Projects.Aspire_RabbitMq_Consumer>("consumers").WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));//.WithReference(rabbit);
 builder.Build().Run();
