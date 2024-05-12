@@ -33,9 +33,13 @@ var orderDbConnectionString = configuration.GetConnectionString("orderdb");
 
 //var rabbit = builder.AddRabbitMQContainer("messaging", password: "aspire");
 
-var discountApi = builder.AddProject<Projects.Discount_API>("discountapi");
+//var discountApi = builder.AddProject<Projects.Discount_API>("discountapi");
+var customContainer = builder.AddContainer("myappdiscountapi", "basketapi")
+                             .WithHttpEndpoint(hostPort: 8080, name: "endpoint");
 
-builder.AddProject<Projects.Basket_API>("basket.api").WithReference(discountApi)
+var discountApi_endpoint = customContainer.GetEndpoint("endpoint");
+
+builder.AddProject<Projects.Basket_API>("basket.api")//.WithReference(discountApi_endpoint)
 .WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));//.WithReference(distributedCaching);
 
 builder.AddProject<Projects.Catalog_API>("catalog.api").WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));
@@ -43,4 +47,5 @@ builder.AddProject<Projects.Catalog_API>("catalog.api").WithEnvironment("GRAFANA
 
 builder.AddProject<Projects.Order_Api>("order.api").WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));
 builder.AddProject<Projects.Aspire_RabbitMq_Consumer>("consumers").WithEnvironment("GRAFANA_URL", grafana.GetEndpoint("grafana-http"));//.WithReference(rabbit);
+builder.AddProject<Projects.WebApplication1>("webapplication1");
 builder.Build().Run();

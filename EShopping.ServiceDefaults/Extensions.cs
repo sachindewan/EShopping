@@ -1,11 +1,8 @@
-using Eshopping.ServiceDefaults;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.Enrichment;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -103,7 +100,8 @@ namespace Microsoft.Extensions.Hosting
 
             // Uncomment the following lines to enable the Prometheus exporter (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
             builder.Services.AddOpenTelemetry()
-               .WithMetrics(metrics => metrics.AddPrometheusExporter());
+          // BUG: Part of the workaround for https://github.com/open-telemetry/opentelemetry-dotnet-contrib/issues/1617
+          .WithMetrics(metrics => metrics.AddPrometheusExporter(options => options.DisableTotalNameSuffixForCounters = true));
 
             // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
             // builder.Services.AddOpenTelemetry()
@@ -157,7 +155,7 @@ namespace Microsoft.Extensions.Hosting
         public static WebApplication MapDefaultEndpoints(this WebApplication app)
         {
             // Uncomment the following line to enable the Prometheus endpoint (requires the OpenTelemetry.Exporter.Prometheus.AspNetCore package)
-             app.MapPrometheusScrapingEndpoint();
+            app.MapPrometheusScrapingEndpoint();
 
             // All health checks must pass for app to be considered ready to accept traffic after starting
             app.MapHealthChecks("/health");

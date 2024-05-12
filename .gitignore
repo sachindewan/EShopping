@@ -55,3 +55,6 @@
 /InfraStructure/Aspire.RabbitMq.Consumer/obj
 /Espire.Common.Logging/bin/Debug/net8.0
 /Espire.Common.Logging/obj
+/Services/TestApi/WebApplication1/bin/Debug/net8.0
+/Services/TestApi/WebApplication1/obj/Debug/net8.0
+/Services/TestApi/WebApplication1/obj
